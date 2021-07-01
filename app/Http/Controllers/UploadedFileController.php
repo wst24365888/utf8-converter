@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\UploadedFile;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UploadedFileController extends Controller
 {
@@ -36,22 +37,24 @@ class UploadedFileController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:csv|max:2048'
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|mimes:txt|max:2048'
         ]);
+
+        if ($validator->fails()) {
+            return response(["success" => false, "message" => $validator->errors()]);
+        }
+
+        $fileName = time() . '_' . $request->file->getClientOriginalName();
+        $filePath = $request->file('file')->storeAs('uploads', $fileName, 'public');
 
         $file = new UploadedFile;
 
-        if ($request->file()) {
-            $fileName = time() . '_' . $request->file->getClientOriginalName();
-            $filePath = $request->file('file')->storeAs('uploads', $fileName, 'public');
+        $file->file_name = $fileName;
+        $file->file_path = '/storage/' . $filePath;
+        $file->save();
 
-            $file->file_name = $fileName;
-            $file->file_path = '/storage/' . $filePath;
-            $file->save();
-
-            return response(["success" => true, "message" => "Uploaded complete. File path: " . $filePath]);
-        }
+        return response(["success" => true, "message" => "Uploaded complete. File path: " . $filePath]);
     }
 
     /**
