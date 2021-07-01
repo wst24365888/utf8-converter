@@ -38,9 +38,14 @@ class UploadedFileController extends Controller
      */
     public function store(Request $request)
     {
-        // validate
+        // supported mime types
+
+        $supportedMimeTypes = "txt,csv";
+
+        // validator
+
         $validator = Validator::make($request->all(), [
-            'file' => 'required|mimes:txt|max:2048'
+            'file' => 'required|mimes:' . $supportedMimeTypes . '|max:2048'
         ]);
 
         if ($validator->fails()) {
