@@ -57,7 +57,7 @@ class UploadedFileController extends Controller
         $file = new UploadedFile;
 
         $file->file_name = $fileName;
-        $file->file_path = '/storage/' . $filePath;
+        $file->file_path = "/app/" . $filePath;
         $file->save();
 
         // read file
@@ -68,8 +68,8 @@ class UploadedFileController extends Controller
 
         $encoding_list = mb_list_encodings();
         $confilic_encoding_list = [
-            "GB18030", 
-            "ISO-8859-1", 
+            "GB18030",
+            "ISO-8859-1",
             "ISO-8859-2",
             "ISO-8859-3",
             "ISO-8859-4",
@@ -108,7 +108,8 @@ class UploadedFileController extends Controller
      */
     public function show($id)
     {
-        //
+        $file = UploadedFile::find($id);
+        return response()->download(storage_path() . $file->file_path, $file->file_name);
     }
 
     /**
