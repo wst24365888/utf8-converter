@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.3'
 
 services:
     app:
@@ -7,7 +7,7 @@ services:
         build: 
             context: .
             dockerfile: Dockerfile
-        # image: utf8-converter:latest
+        image: utf8-converter:latest
         container_name: utf8-converter-app
         restart: unless-stopped
         ports:
@@ -16,6 +16,8 @@ services:
         image: mysql:latest
         restart: unless-stopped
         container_name: utf8-converter-db
+        command: 
+            - --innodb-buffer-pool-size=64M
         environment:
             MYSQL_ROOT_USER: root
             MYSQL_ROOT_PASSWORD: <password>
