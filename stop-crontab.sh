@@ -1,0 +1,1 @@
+kill $(ps aux | grep 'schedule:work' | awk '{print $1}')

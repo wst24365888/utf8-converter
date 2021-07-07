@@ -1,11 +1,17 @@
 shell:
-	docker exec -it utf8-converter-app bash || exit 0
+	docker exec -it utf8-converter-app /bin/sh || exit 0
 
 tinker:
 	docker exec -it utf8-converter-app php artisan tinker || exit 0
 
 migrate:
-	docker exec -it utf8-converter-app php artisan migrate || exit 0
+	docker exec -it utf8-converter-app php artisan migrate
+
+crontab:
+	docker exec -itd utf8-converter-app php artisan schedule:work
+
+stop-crontab:
+	docker exec -itd utf8-converter-app /bin/sh ./stop-crontab.sh
 
 update-packages:
 	docker exec -it utf8-converter-app composer update --with-all-dependencies

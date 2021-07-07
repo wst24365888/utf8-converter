@@ -44,7 +44,16 @@
             if(response["success"]) {
                 alert("File uploaded.");
 
+                // Download the file.
                 window.location.href = "/uploaded_file/" + response["file_id"];
+
+                // Delete the file.
+                // $.ajax({
+                //     method: "DELETE",
+                //     url: "/uploaded_file/" + response["file_id"],
+                // }).done(function (response) {
+                //     console.log(response);
+                // });
             } else {
                 alert(response["message"]["file"]);
             }

@@ -54,15 +54,15 @@ class UploadedFileController extends Controller
 
         // store file
 
-        $fileName = time() . '_' . $request->file->getClientOriginalName();
-        $filePath = Storage::putFileAs('public/uploads', $request->file('file'), $fileName);
+        $fileName = $request->file->getClientOriginalName();
+        $filePath = Storage::putFileAs('public/uploads', $request->file('file'), time() . '_' . $fileName);
 
         // add to db
 
         $file = new UploadedFile;
 
         $file->file_name = $fileName;
-        $file->file_path = "/app/" . $filePath;
+        $file->file_path = $filePath;
         $file->save();
 
         // read file
@@ -100,9 +100,13 @@ class UploadedFileController extends Controller
         // convert to utf-8
 
         $fileContent = mb_convert_encoding($fileContent, "UTF-8", mb_detect_encoding($fileContent, $encoding_list, true));
-        Storage::put($filePath, $fileContent);
+        $success = Storage::put($filePath, $fileContent);
 
-        return response(["success" => true, "message" => "Uploaded complete. File path: " . $filePath, "file_id" => $file->id]);
+        if($success) {            
+            return response(["success" => true, "message" => "Uploaded complete. File path: " . $filePath, "file_id" => $file->id]);
+        } else {
+            return response(["success" => false, "message" => "Storage error.", "file_id" => null]);
+        }
     }
 
     /**
@@ -114,7 +118,8 @@ class UploadedFileController extends Controller
     public function show($id)
     {
         $file = UploadedFile::find($id);
-        return response()->download(storage_path() . $file->file_path, $file->file_name);
+
+        return response()->download(storage_path() . "/app/" . $file->file_path, $file->file_name);
     }
 
     /**
@@ -148,6 +153,13 @@ class UploadedFileController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $file = UploadedFile::find($id);
+        $success = Storage::delete($file->file_path);
+
+        if($success) {
+            return response(["success" => true, "message" => "File: \"" . $file->file_path . "\" has been deleted."]);
+        } else {
+            return response(["success" => false, "message" => "Storage error. File: \"" . $file->file_path . "\" was not deleted."]);
+        }
     }
 }
